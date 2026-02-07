@@ -48,10 +48,10 @@
 <script type="importmap">
 {
   "imports": {
-    "react": "https://esm.sh/react@^19.2.3",
-    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
-    "react/": "https://esm.sh/react@^19.2.3/",
-    "lucide-react": "https://esm.sh/lucide-react@^0.562.0"
+    "react/": "https://esm.sh/react@^19.2.4/",
+    "react": "https://esm.sh/react@^19.2.4",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.4/",
+    "lucide-react": "https://esm.sh/lucide-react@^0.563.0"
   }
 }
 </script>
@@ -61,16 +61,30 @@
     <!-- ================= VIEWS ================= -->
 
     <!-- 1. START SCREEN -->
-    <div id="view-start" class="fixed inset-0 z-50 bg-[#003366] text-white flex flex-col items-center justify-center p-8 text-center">
-        <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10 pointer-events-none"></div>
-        <div class="relative z-10 flex flex-col items-center animate-fade-in">
-            <i data-lucide="flask-conical" class="w-24 h-24 mb-6 text-[#FF8C00] animate-bounce"></i>
-            <h1 class="text-4xl font-bold mb-8 tracking-tight">LabLabel</h1>
-            <div class="max-w-xs space-y-4 mb-12 text-gray-300 text-sm">
-                <p>Você é o novo Técnico Responsável. Sua tarefa é analisar as Fichas de Segurança e rotular os frascos corretamente.</p>
-                <p>Erros podem causar acidentes graves.</p>
+    <div id="view-start" class="fixed inset-0 z-50 bg-[#003366] text-white flex flex-col items-center justify-center p-8 text-center overflow-y-auto">
+        <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10 pointer-events-none fixed"></div>
+        <div class="relative z-10 flex flex-col items-center animate-fade-in max-w-2xl w-full my-auto">
+            <i data-lucide="flask-conical" class="w-20 h-20 mb-4 text-[#FF8C00] animate-bounce"></i>
+            <h1 class="text-4xl font-bold mb-6 tracking-tight">LabLabel</h1>
+            
+            <!-- Instructions Container -->
+            <div class="w-full space-y-4 mb-8 text-left bg-white/10 p-6 rounded-lg backdrop-blur-sm border border-white/20 text-gray-100 text-sm shadow-xl">
+                <p class="font-semibold text-lg text-white mb-2">Você é o novo Técnico Responsável.</p>
+                <p>Sua tarefa é analisar as Fichas de Segurança e rotular os frascos corretamente.</p>
+                <p>Rotular e escolher o recipiente correto para cada substância apresentada seguindo a Ficha de Dados (FISPQ/GHS). Cada nível é uma substância diferente (8 níveis no total).</p>
+                
+                <div class="bg-black/20 p-4 rounded mt-4">
+                    <p class="font-bold text-[#FF8C00] mb-2 uppercase text-xs tracking-wider">O jogador deve:</p>
+                    <ul class="list-disc pl-5 space-y-2">
+                        <li>Selecionar o recipiente adequado (um dos botões em "Recipiente").</li>
+                        <li>Selecionar os pictogramas GHS corretos (na aba "Rótulos GHS").</li>
+                        <li>Clicar em <strong>Armazenar</strong> para submeter a resposta. É possível abrir a "Ficha" (botão "Ler Ficha") para ver descrição, riscos e manuseio.</li>
+                    </ul>
+                </div>
+                <p class="text-xs text-center text-gray-400 mt-2">Erros podem causar acidentes graves.</p>
             </div>
-            <button onclick="startGame()" class="bg-[#FF8C00] text-white text-lg font-bold py-4 px-12 rounded shadow-[0_4px_0_rgb(180,90,0)] active:shadow-none active:translate-y-1 transition-all uppercase tracking-wider hover:bg-[#ff991f] cursor-pointer">
+
+            <button onclick="startGame()" class="bg-[#FF8C00] text-white text-lg font-bold py-4 px-12 rounded shadow-[0_4px_0_rgb(180,90,0)] active:shadow-none active:translate-y-1 transition-all uppercase tracking-wider hover:bg-[#ff991f] cursor-pointer w-full sm:w-auto">
                 Iniciar Turno
             </button>
         </div>
@@ -82,8 +96,14 @@
             <i data-lucide="flask-conical" class="w-4 h-4 text-[#FF8C00]"></i>
             <span>LAB-LABEL</span>
         </div>
-        <div class="font-mono text-xs text-gray-300">
-            ITEM <span id="level-indicator">1/8</span>
+        <div class="flex items-center gap-3">
+            <div class="font-mono text-xs text-gray-300">
+                ITEM <span id="level-indicator">1/8</span>
+            </div>
+            <div class="h-4 w-px bg-gray-600"></div>
+            <button onclick="openHelp()" class="text-gray-300 hover:text-[#FF8C00] transition-colors p-1 flex items-center justify-center" title="Ajuda / Instruções">
+                <i data-lucide="help-circle" class="w-5 h-5"></i>
+            </button>
         </div>
     </div>
 
@@ -224,7 +244,39 @@
         </div>
     </div>
 
-    <!-- 5. FEEDBACK MODAL -->
+    <!-- 5. HELP MODAL -->
+    <div id="modal-help" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-fade-in">
+        <div class="bg-white rounded-lg shadow-2xl w-full max-w-md overflow-hidden flex flex-col max-h-[90vh]">
+            <div class="bg-[#003366] p-4 flex justify-between items-center text-white shrink-0">
+                <div class="flex items-center gap-2 font-bold">
+                    <i data-lucide="help-circle" class="w-5 h-5 text-[#FF8C00]"></i>
+                    <span>Instruções do Protocolo</span>
+                </div>
+                <button onclick="closeHelp()" class="hover:bg-white/10 p-1 rounded transition-colors">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <div class="p-6 overflow-y-auto text-gray-700 text-sm leading-relaxed space-y-4">
+                <p>Você é o novo Técnico Responsável. Sua tarefa é analisar as Fichas de Segurança e rotular os frascos corretamente.</p>
+                <p>Rotular e escolher o recipiente correto para cada substância apresentada seguindo a Ficha de Dados (FISPQ/GHS). Cada nível é uma substância diferente (8 níveis no total).</p>
+                <div class="bg-blue-50 p-4 rounded-md border border-blue-100">
+                    <p class="font-bold text-[#003366] mb-2">O jogador deve:</p>
+                    <ul class="list-disc pl-5 space-y-2">
+                        <li>Selecionar o recipiente adequado (um dos botões em "Recipiente").</li>
+                        <li>Selecionar os pictogramas GHS corretos (na aba "Rótulos GHS").</li>
+                        <li>Clicar em <strong>Armazenar</strong> para submeter a resposta. É possível abrir a "Ficha" (botão "Ler Ficha") para ver descrição, riscos e manuseio.</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="p-4 border-t border-gray-200 bg-gray-50 text-right">
+                <button onclick="closeHelp()" class="bg-[#003366] text-white px-6 py-2 rounded font-bold uppercase text-xs hover:bg-[#002244] transition-colors">
+                    Fechar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 6. FEEDBACK MODAL -->
     <div id="modal-feedback" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-6">
         <div id="feedback-card" class="w-full max-w-sm p-6 rounded-lg shadow-2xl text-center border-t-8 flex flex-col max-h-[90vh] bg-white border-gray-500">
             <div class="overflow-y-auto p-2 flex-1">
@@ -255,7 +307,7 @@
         </div>
     </div>
 
-    <!-- 6. FINAL REPORT -->
+    <!-- 7. FINAL REPORT -->
     <div id="view-report" class="hidden min-h-screen w-full bg-slate-100 flex flex-col items-center justify-center p-6">
         <div class="bg-white w-full max-w-md p-8 rounded-lg shadow-2xl border-t-8 border-[#003366] text-center max-h-[90vh] flex flex-col">
             <div class="shrink-0">
@@ -417,6 +469,7 @@
         // Modals
         const modalDoc = document.getElementById('modal-doc');
         const modalFeedback = document.getElementById('modal-feedback');
+        const modalHelp = document.getElementById('modal-help');
 
         // --- INITIALIZATION ---
         function init() {
@@ -640,6 +693,9 @@
 
         function openDoc() { modalDoc.classList.remove('hidden'); }
         function closeDoc() { modalDoc.classList.add('hidden'); }
+        
+        function openHelp() { modalHelp.classList.remove('hidden'); }
+        function closeHelp() { modalHelp.classList.add('hidden'); }
 
         // --- SUBMISSION & SCORING ---
 
